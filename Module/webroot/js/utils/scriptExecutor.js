@@ -126,12 +126,15 @@ function runScript(scriptName, basePath, button, callback) {
   const cb = `cb_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
   let timeoutId;
 
-  window[cb] = (output) => {
+  window[cb] = (a, b, c) => {
     clearTimeout(timeoutId);
     delete window[cb];
     if (button) button.className = originalClass;
-    handleScriptResult(output, scriptName);
-    if (typeof callback === "function") callback(output);
+    const normalized = (typeof b === "undefined" && typeof c === "undefined")
+      ? { code: 0, out: a, err: "" }
+      : { code: a, out: b, err: c };
+    handleScriptResult(normalized, scriptName);
+    if (typeof callback === "function") callback(normalized);
   };
 
   try {

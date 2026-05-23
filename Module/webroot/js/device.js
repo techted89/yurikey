@@ -60,7 +60,13 @@ function setupRefreshButton() {
     refreshBtn.classList.add("rotating");
 
     if (typeof window.runScript === "function") {
-      window.runScript(scriptName, BASE_SCRIPT, refreshBtn, async () => {
+      window.runScript(scriptName, BASE_SCRIPT, refreshBtn, async (scriptResult) => {
+        if (scriptResult === null) {
+          refreshBtn.classList.remove("rotating");
+          refreshBtn.disabled = false;
+          return;
+        }
+
         try {
           const data = await waitForValidDeviceInfo();
           document.getElementById("android-version").innerText = data.android || "-";
