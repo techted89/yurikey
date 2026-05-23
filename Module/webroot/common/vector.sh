@@ -19,9 +19,10 @@ if ! rm -rf /data/dalvik-cache/*; then
 fi
 
 echo "Resetting security contexts..."
-if ! restorecon -R /data/adb/lspd 2>/dev/null; then
-    echo "Error: Failed to restore security contexts" >&2
-    exit 1
+if command -v restorecon >/dev/null 2>&1 && [ -d /data/adb/lspd ]; then
+    if ! restorecon -R /data/adb/lspd 2>/dev/null; then
+        echo "Warning: Failed to restore security contexts" >&2
+    fi
 fi
 
 echo "Vector optimization and detection fix complete."

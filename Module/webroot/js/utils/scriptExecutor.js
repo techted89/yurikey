@@ -92,7 +92,7 @@ function closeHistoryDialog() {
   overlay.classList.remove("active");
 }
 
-function handleScriptResult(rawOutput, scriptName) {
+function handleScriptResult(rawOutput, scriptName, options) {
   const raw = typeof rawOutput === "string" ? rawOutput.trim() : "";
 
   if (!raw) {
@@ -112,7 +112,11 @@ function handleScriptResult(rawOutput, scriptName) {
     }
   } catch {
     addScriptHistory(scriptName, raw);
-    showToast(tFormat("success", { script: scriptName }), "success", 3500);
+    if (options?.code !== 0 && options?.code != null) {
+      showToast(t("script_execution_failed_generic"), "error", 4000);
+    } else {
+      showToast(tFormat("success", { script: scriptName }), "success", 3500);
+    }
   }
 }
 
@@ -135,15 +139,13 @@ function runScript(scriptName, basePath, button, callback) {
     }
   };
 
-  window[cb] = async (output) => {
-    try {
-      clearTimeout(timeoutId);
-      delete window[cb];
-      handleScriptResult(output, scriptName);
-      if (typeof callback === "function") await Promise.resolve(callback(output));
-    } finally {
-      restoreButton();
-    }
+  window[cb] = async (code, out, err) => {
+    clearTimeout(timeoutId);
+    delete window[cb];
+    if (code !== 0) handleScriptResult(err || out || "", scriptName, { code });
+    else handleScriptResult(out || "", scriptName);
+    if (typeof callback === "function") await Promise.resolve(callback(code, out, err));
+    restoreButton();
   };
 
   try {
