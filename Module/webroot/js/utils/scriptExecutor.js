@@ -116,12 +116,12 @@ function handleScriptResult(rawOutput, scriptName) {
   }
 }
 
-function runScript(scriptName, basePath, button) {
+function runScript(scriptName, basePath, button, callback) {
   const scriptPath = `${basePath}${scriptName}`;
   const executeScript = getScriptExecutor();
 
-  const originalClass = button.className;
-  button.classList.add("executing");
+  const originalClass = button ? button.className : null;
+  if (button) button.classList.add("executing");
 
   const cb = `cb_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
   let timeoutId;
@@ -129,8 +129,9 @@ function runScript(scriptName, basePath, button) {
   window[cb] = (output) => {
     clearTimeout(timeoutId);
     delete window[cb];
-    button.className = originalClass;
+    if (button) button.className = originalClass;
     handleScriptResult(output, scriptName);
+    if (typeof callback === "function") callback(output);
   };
 
   try {
@@ -143,17 +144,19 @@ function runScript(scriptName, basePath, button) {
   } catch (_e) {
     clearTimeout(timeoutId);
     delete window[cb];
-    button.className = originalClass;
+    if (button) button.className = originalClass;
     addScriptHistory(scriptName, t("script_execution_failed_generic"));
     showToast(t("script_execution_failed_generic"), "error", 4500);
+    if (typeof callback === "function") callback(null);
     return;
   }
 
   timeoutId = setTimeout(() => {
     delete window[cb];
-    button.className = originalClass;
+    if (button) button.className = originalClass;
     addScriptHistory(scriptName, tFormat("timeout", { script: scriptName }));
     showToast(t("script_execution_failed_generic"), "error", 4500);
+    if (typeof callback === "function") callback(null);
   }, 7000);
 }
 

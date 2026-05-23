@@ -4,22 +4,14 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("main.js active");
 
-  const BASE_SCRIPT = "/data/adb/modules/Yurikey/Yuri/";
+  const BASE_SCRIPT = "/data/adb/modules/Yurikey/";
 
-  // Register click events for buttons in Actions Page
-  document.querySelectorAll("#actions-page .menu-btn[data-script]").forEach(button => {
+  // Register click events for all menu buttons with data-script attribute (except refresh button which is handled in device.js)
+  document.querySelectorAll(".menu-btn[data-script]:not(#refresh-info-btn)").forEach(button => {
     const scriptName = button.dataset.script;
-    if (scriptName) {
-      button.addEventListener("click", () => runScript(scriptName, BASE_SCRIPT, button));
+    if (scriptName && typeof window.runScript === "function") {
+      button.addEventListener("click", () => window.runScript(scriptName, BASE_SCRIPT, button));
     }
-  });
-
-  // Register click events for buttons in Advanced Menu Page
-  document.querySelectorAll("#advance-menu .menu-btn[data-script]").forEach(button => {
-      const scriptName = button.dataset.script;
-      if (scriptName) {
-          button.addEventListener("click", () => runScript(scriptName, BASE_SCRIPT, button));
-      }
   });
 
   const historyCard = document.getElementById("module-version-card");
@@ -36,16 +28,4 @@ document.addEventListener("DOMContentLoaded", () => {
     writeHistory([]);
     renderHistoryDialog();
   });
-
-  // Refresh info button event
-  const refreshBtn = document.getElementById("refresh-info-btn");
-  if (refreshBtn) {
-    refreshBtn.addEventListener("click", () => {
-      showToast(t("home_refreshing"), "info");
-      updateNetworkStatus();
-      if (window.loadDeviceInfo) {
-        window.loadDeviceInfo();
-      }
-    });
-  }
 });
