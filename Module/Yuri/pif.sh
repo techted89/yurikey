@@ -23,18 +23,18 @@ fetch_pif () {
       sh "$TARGET_FILE/autopif.sh"
     elif [ "$MODULE_NAME" = "Play Integrity Fork" ]; then
       log_message "Detected Play Integrity Fork. Executing..."
-      sh "$TARGET_FILE/autopif4.sh" -m || exit
+      sh "$TARGET_FILE/autopif4.sh" -m || exit 1
     else
       log_message "Unknown module $MODULE_NAME"
       log_message "Please use Play Integrity Fix [INJECTS] or Play Integrity Fork to update fingeprint"
-      exit
+      exit 1
     fi
 }
 
 update_pif () {
     if ! fetch_pif; then
         log_message "Failed to update fingerprints!"
-        exit
+        exit 1
     fi
 }
 

@@ -21,7 +21,7 @@
   "advance_menu_title": "Ajustes Avanzados",
   "advance_clear_all_detection_traces": "Limpiar Detección",
   "advance_set_hma-oss_configs": "Elegir Configuración HMA",
-  "advance_fix_detect_vector": "Corregir Detección (2)",
+  "advance_fix_detect_vector": "Corregir Detección Vector (2)",
   "advance_fix_detect_pif": "Solucionar Detección PIF (1)",
   "advance_fix_detect_recovery_file": "Solucionar Detección de Recuperación",
   "advance_kill_all": "Matar todos los procesos",

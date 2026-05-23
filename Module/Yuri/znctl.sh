@@ -44,7 +44,7 @@ zn_configs() {
 set_zn_configs () {
   if ! zn_configs; then
     log_message "Failed to update configs!"
-    exit
+    exit 1
   fi
 }
 

@@ -120,7 +120,6 @@ function runScript(scriptName, basePath, button, callback) {
   const scriptPath = `${basePath}${scriptName}`;
   const executeScript = getScriptExecutor();
 
-  const originalClass = button ? button.className : null;
   if (button) {
     button.classList.add("executing");
     button.disabled = true;
@@ -129,15 +128,22 @@ function runScript(scriptName, basePath, button, callback) {
   const cb = `cb_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
   let timeoutId;
 
-  window[cb] = (output) => {
-    clearTimeout(timeoutId);
-    delete window[cb];
+  const restoreButton = () => {
     if (button) {
-      button.className = originalClass;
+      button.classList.remove("executing");
       button.disabled = false;
     }
-    handleScriptResult(output, scriptName);
-    if (typeof callback === "function") callback(output);
+  };
+
+  window[cb] = async (output) => {
+    try {
+      clearTimeout(timeoutId);
+      delete window[cb];
+      handleScriptResult(output, scriptName);
+      if (typeof callback === "function") await Promise.resolve(callback(output));
+    } finally {
+      restoreButton();
+    }
   };
 
   try {
@@ -150,10 +156,7 @@ function runScript(scriptName, basePath, button, callback) {
   } catch (_e) {
     clearTimeout(timeoutId);
     delete window[cb];
-    if (button) {
-      button.className = originalClass;
-      button.disabled = false;
-    }
+    restoreButton();
     addScriptHistory(scriptName, t("script_execution_failed_generic"));
     showToast(t("script_execution_failed_generic"), "error", 4500);
     if (typeof callback === "function") callback(null);
@@ -162,10 +165,7 @@ function runScript(scriptName, basePath, button, callback) {
 
   timeoutId = setTimeout(() => {
     delete window[cb];
-    if (button) {
-      button.className = originalClass;
-      button.disabled = false;
-    }
+    restoreButton();
     addScriptHistory(scriptName, tFormat("timeout", { script: scriptName }));
     showToast(t("script_execution_failed_generic"), "error", 4500);
     if (typeof callback === "function") callback(null);

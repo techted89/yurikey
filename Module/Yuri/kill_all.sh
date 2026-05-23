@@ -13,7 +13,7 @@ PKGS="com.android.vending com.google.android.gsf com.google.android.gms com.goog
 
 for pkg in $PKGS; do
     # Check if package is installed before attempting to stop/clear
-    if pm list packages | grep -q "$pkg"; then
+    if pm list packages | grep -qxF "package:$pkg"; then
         am force-stop "$pkg" >/dev/null 2>&1
         pm clear "$pkg" >/dev/null 2>&1
     fi

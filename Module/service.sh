@@ -93,5 +93,5 @@ check_reset_prop "ro.boot.warranty_bit" "0"
 check_reset_prop "ro.warranty_bit" "0"
 
 # Hiding root traces in logs
-resetprop -n log.tag.Magisk "DEBUG"
-resetprop -n log.tag.Zygisk "DEBUG"
+resetprop -n log.tag.Magisk "S"
+resetprop -n log.tag.Zygisk "S"
