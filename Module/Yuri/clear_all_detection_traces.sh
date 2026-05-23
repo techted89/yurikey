@@ -99,6 +99,10 @@ detector_data() {   # For /storage/emulated/0/Android/data/* if exists
     remove_path "/storage/emulated/0/Android/data/com.native.checker"
     remove_path "/storage/emulated/0/Android/data/com.syscall.detector"
     remove_path "/storage/emulated/0/Android/data/com.memory.scan"
+    remove_path "/storage/emulated/0/Android/data/com.pyshivam.geergit"
+    remove_path "/storage/emulated/0/Android/data/com.rem01gaming.disclosure"
+    remove_path "/storage/emulated/0/Android/data/com.eltavine.duckdetector"
+    remove_path "/storage/emulated/0/Android/data/com.studio.duckdetector"
     remove_path "/storage/emulated/0/meow_detector.log"
     remove_path "/storage/emulated/0/keybox_status.json" 
     
@@ -281,6 +285,8 @@ reset_prop() { # Changing on build.prop file
     # Emulator traces
     resetprop ro.kernel.qemu 0
     resetprop ro.boot.qemu 0
+    resetprop ro.boot.verifiedbootstate green
+    resetprop ro.boot.veritymode enforcing
     resetprop ro.hardware.virtual_device 0
 }
 

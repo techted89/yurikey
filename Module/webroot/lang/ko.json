@@ -21,7 +21,7 @@
   "advance_menu_title": "고급 메뉴",
   "advance_clear_all_detection_traces": "모든 탐지 흔적 지우기",
   "advance_set_hma-oss_configs": "HMA-oss 구성 설정",
-  "advance_fix_detect_lsposed": "LSPosed 탐지 수정 (2)",
+  "advance_fix_detect_vector": "Vector 탐지 수정 (2)",
   "advance_fix_detect_pif": "PIF 탐지 수정 (1)",
   "advance_fix_detect_recovery_file": "리커버리 파일 탐지 수정",
   "advance_kill_all": "모든 프로세스 종료",

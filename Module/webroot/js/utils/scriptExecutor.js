@@ -121,23 +121,23 @@ function runScript(scriptName, basePath, button, callback) {
   const executeScript = getScriptExecutor();
 
   const originalClass = button ? button.className : null;
-  if (button) button.classList.add("executing");
+  if (button) {
+    button.classList.add("executing");
+    button.disabled = true;
+  }
 
   const cb = `cb_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
   let timeoutId;
 
-  window[cb] = (a, b, c) => {
+  window[cb] = (output) => {
     clearTimeout(timeoutId);
     delete window[cb];
-    if (button) button.className = originalClass;
-    const normalized = (typeof b === "undefined" && typeof c === "undefined")
-      ? { code: 0, out: a, err: "" }
-      : { code: a, out: b, err: c };
-    const output = normalized.code !== 0
-      ? normalized.err
-      : (normalized.out + (normalized.err ? "\n" + normalized.err : ""));
+    if (button) {
+      button.className = originalClass;
+      button.disabled = false;
+    }
     handleScriptResult(output, scriptName);
-    if (typeof callback === "function") callback(normalized);
+    if (typeof callback === "function") callback(output);
   };
 
   try {
@@ -150,7 +150,10 @@ function runScript(scriptName, basePath, button, callback) {
   } catch (_e) {
     clearTimeout(timeoutId);
     delete window[cb];
-    if (button) button.className = originalClass;
+    if (button) {
+      button.className = originalClass;
+      button.disabled = false;
+    }
     addScriptHistory(scriptName, t("script_execution_failed_generic"));
     showToast(t("script_execution_failed_generic"), "error", 4500);
     if (typeof callback === "function") callback(null);
@@ -159,11 +162,14 @@ function runScript(scriptName, basePath, button, callback) {
 
   timeoutId = setTimeout(() => {
     delete window[cb];
-    if (button) button.className = originalClass;
+    if (button) {
+      button.className = originalClass;
+      button.disabled = false;
+    }
     addScriptHistory(scriptName, tFormat("timeout", { script: scriptName }));
     showToast(t("script_execution_failed_generic"), "error", 4500);
     if (typeof callback === "function") callback(null);
-  }, 7000);
+  }, 30000);
 }
 
 // Export functions to window object

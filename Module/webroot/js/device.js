@@ -59,14 +59,12 @@ function setupRefreshButton() {
     refreshBtn.disabled = true;
     refreshBtn.classList.add("rotating");
 
-    if (typeof window.runScript === "function") {
-      window.runScript(scriptName, BASE_SCRIPT, refreshBtn, async (scriptResult) => {
-        if (scriptResult === null) {
-          refreshBtn.classList.remove("rotating");
-          refreshBtn.disabled = false;
-          return;
-        }
+    if (typeof showToast === "function" && typeof t === "function") {
+      showToast(t("home_refreshing"), "info");
+    }
 
+    if (typeof window.runScript === "function") {
+      window.runScript(scriptName, BASE_SCRIPT, refreshBtn, async () => {
         try {
           const data = await waitForValidDeviceInfo();
           document.getElementById("android-version").innerText = data.android || "-";
@@ -74,6 +72,10 @@ function setupRefreshButton() {
           document.getElementById("root-type").innerText = data.root || "-";
         } catch (err) {
           console.warn("Could not update device info:", err);
+        }
+
+        if (typeof window.updateNetworkStatus === "function") {
+          window.updateNetworkStatus();
         }
 
         refreshBtn.classList.remove("rotating");

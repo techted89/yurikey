@@ -21,7 +21,7 @@ log_message "Start"
 if [ ! -d "$DEPENDENCY_MODULE_UPDATE" ] && [ ! -d "$DEPENDENCY_MODULE" ]; then
   log_message "Error: Tricky Store module file not found!"
   log_message "Please install Tricky Store before using Yuri Keybox."
-  return 0
+  exit 0
 fi
 
 # Backup keybox before fetching
@@ -47,19 +47,19 @@ get_keybox() {
         log_message "Error: Base64 decode failed!"
         rm -f "$REMOTE_FILE"
         mv "$BACKUP_FILE" "$TARGET_FILE"
-        return 1
+        exit 1
     fi
 
     rm -f "$REMOTE_FILE"
     mv "$DECODE_FILE" "$TARGET_FILE"
-    return 0
+    exit 0
 }
 
 # Function to update the keybox file
 update_keybox() {
   if ! get_keybox; then
     log_message "Failed to fetch keybox!"
-    return
+    exit
   fi
 }
 

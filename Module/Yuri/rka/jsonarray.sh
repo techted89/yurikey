@@ -28,7 +28,7 @@ function split_objects(json, objs,    n, i, c, prev, in_str, depth, start) {
         if (c == "{") { depth++; if (depth == 1) start = i }
         else if (c == "}") { depth--; if (depth == 0) { n++; objs[n] = substr(json, start, i - start + 1) } }
     }
-    return n
+    exit n
 }
 
 function get_field(obj, fname,    i, c, kstart, kend, key, vstart, val) {
@@ -54,17 +54,17 @@ function get_field(obj, fname,    i, c, kstart, kend, key, vstart, val) {
                 while (i <= length(obj)) { c = substr(obj, i, 1); if (c == "," || c == "}" || c == " " || c == "\n" || c == "\r" || c == "\t") break; i++ }
                 val = substr(obj, vstart, i - vstart)
             }
-            if (key == fname) return val
+            if (key == fname) exit val
         }
         i++
     }
-    return ""
+    exit ""
 }
 
 function unquote(v) {
     if (substr(v, 1, 1) == "\"" && substr(v, length(v), 1) == "\"")
-        return substr(v, 2, length(v) - 2)
-    return v
+        exit substr(v, 2, length(v) - 2)
+    exit v
 }
 
 function get_keys(obj, keys,    n, i, c, kstart, kend, key) {
@@ -87,7 +87,7 @@ function get_keys(obj, keys,    n, i, c, kstart, kend, key) {
         }
         i++
     }
-    return n
+    exit n
 }
 
 function rebuild_object(obj, skip_field,    keys, nk, k, v, out, sep) {
@@ -96,7 +96,7 @@ function rebuild_object(obj, skip_field,    keys, nk, k, v, out, sep) {
         if (keys[k] == skip_field) continue
         v = get_field(obj, keys[k]); out = out sep "\"" keys[k] "\":" v; sep = ","
     }
-    return out "}"
+    exit out "}"
 }
 
 function set_field_in_obj(obj, fname, fval,    keys, nk, k, v, out, sep, found) {
@@ -107,21 +107,21 @@ function set_field_in_obj(obj, fname, fval,    keys, nk, k, v, out, sep, found) 
         out = out sep "\"" keys[k] "\":" v; sep = ","
     }
     if (!found) out = out sep "\"" fname "\":" fval
-    return out "}"
+    exit out "}"
 }
 
 function rebuild_array(objs, count,    out, i) {
     out = "["
     for (i = 1; i <= count; i++) { if (i > 1) out = out ","; out = out objs[i] }
-    return out "]"
+    exit out "]"
 }
 
 function find_entry(objs, count, target,    i, idx) {
     for (i = 1; i <= count; i++)
-        if (unquote(get_field(objs[i], "id")) == target) return i
+        if (unquote(get_field(objs[i], "id")) == target) exit i
     idx = int(target)
-    if (idx >= 1 && idx <= count) return idx
-    return 0
+    if (idx >= 1 && idx <= count) exit idx
+    exit 0
 }
 
 { if (NR == 1) json = $0; else json = json "\n" $0 }
@@ -257,7 +257,7 @@ ja_add() {
 $_a" || _pairs="$_a"
     done
     _pairs_esc=$(printf '%s\n' "$_pairs" | awk '{gsub(/\\/,"\\\\")}{if(NR>1)printf "\\n";printf "%s",$0}')
-    _out=$(awk -v OP=add -v PAIRS="$_pairs_esc" "$_JA_AWK" "$_f") || return 1
+    _out=$(awk -v OP=add -v PAIRS="$_pairs_esc" "$_JA_AWK" "$_f") || exit 1
     printf '%s\n' "$_out" > "$_f"
     if [ "$_has_id" -eq 0 ]; then
         printf '%s\n' "$_uid"
@@ -268,18 +268,18 @@ $_a" || _pairs="$_a"
 
 ja_set() {
     _ja_ensure "$1"
-    _out=$(awk -v OP=set -v P1="$2" -v P2="$3" -v P3="$4" -v P4="$5" "$_JA_AWK" "$1") || return 1
+    _out=$(awk -v OP=set -v P1="$2" -v P2="$3" -v P3="$4" -v P4="$5" "$_JA_AWK" "$1") || exit 1
     printf '%s\n' "$_out" > "$1"
 }
 
 ja_del() {
     _ja_ensure "$1"
-    _out=$(awk -v OP=del -v P1="$2" "$_JA_AWK" "$1") || return 1
+    _out=$(awk -v OP=del -v P1="$2" "$_JA_AWK" "$1") || exit 1
     printf '%s\n' "$_out" > "$1"
 }
 
 ja_delfield() {
     _ja_ensure "$1"
-    _out=$(awk -v OP=delfield -v P1="$2" -v P2="$3" "$_JA_AWK" "$1") || return 1
+    _out=$(awk -v OP=delfield -v P1="$2" -v P2="$3" "$_JA_AWK" "$1") || exit 1
     printf '%s\n' "$_out" > "$1"
 }

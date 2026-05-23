@@ -21,6 +21,7 @@ ui_print ""
 
 # Remove old module if legacy path exists (lowercase 'yurikey')
 if [ -d "/data/adb/modules/yurikey" ]; then
+  ui_print "- Removing old yurikey module..."
   touch /data/adb/modules/yurikey/remove
 fi
 
@@ -98,7 +99,7 @@ else
   # fallback: run already-installed one
   if [ -f /data/adb/modules_update/Yurikey/webroot/common/device-info.sh ]; then
     sh /data/adb/modules_update/Yurikey/webroot/common/device-info.sh
-  elif [ -f /data/adb/modules/yurikey/webroot/common/device-info.sh ]; then
-    sh /data/adb/modules/yurikey/webroot/common/device-info.sh
+  elif [ -f /data/adb/modules/Yurikey/webroot/common/device-info.sh ]; then
+    sh /data/adb/modules/Yurikey/webroot/common/device-info.sh
   fi
 fi

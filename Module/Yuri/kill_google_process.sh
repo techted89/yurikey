@@ -12,14 +12,9 @@ log_message "Writing"
 PKGS="com.android.vending"
 
 for pkg in $PKGS; do
-    if ! am force-stop "$pkg" >/dev/null 2>&1; then
-        log_message "Error: Failed to force-stop $pkg"
-        return 1
-    fi
-
-    if ! cmd package trim-caches 0 "$pkg" >/dev/null 2>&1; then
-        log_message "Error: Failed to clear cache for $pkg"
-        return 1
+    if pm list packages | grep -q "$pkg"; then
+        am force-stop "$pkg" >/dev/null 2>&1
+        cmd package trim-caches 0 "$pkg" >/dev/null 2>&1
     fi
 done
 

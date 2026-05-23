@@ -51,11 +51,11 @@ _lsp_str_to_hex() { printf '%s' "$1" | xxd -p | tr -d '\n' | tr 'a-f' 'A-F'; }
 _lsp_query() { "$LSP_SQLITE" "$LSP_DB" "$1"; }
 
 _lsp_check_schema() {
-    [ -n "$_LSP_SCHEMA_OK" ] && return 0
+    [ -n "$_LSP_SCHEMA_OK" ] && exit 0
 
     if [ ! -f "$LSP_DB" ]; then
         echo "lspmcfg: database not found: $LSP_DB" >&2
-        return 1
+        exit 1
     fi
 
     _tables=$(_lsp_query "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;")
@@ -64,7 +64,7 @@ _lsp_check_schema() {
         *)
             echo "lspmcfg: table 'module_configs' missing" >&2
             echo "lspmcfg: tables found: $_tables" >&2
-            return 1
+            exit 1
             ;;
     esac
 
@@ -79,15 +79,15 @@ _lsp_check_schema() {
     if [ -n "$_missing" ]; then
         echo "lspmcfg: incompatible schema, missing:$_missing" >&2
         echo "lspmcfg: columns found: $_cols" >&2
-        return 1
+        exit 1
     fi
 
     _LSP_SCHEMA_OK=1
-    return 0
+    exit 0
 }
 
 _lsp_query_blob() {
-    _lsp_check_schema || return 1
+    _lsp_check_schema || exit 1
     _lsp_query \
       "SELECT hex(data) FROM module_configs \
          WHERE module_pkg_name='$1' \
@@ -97,7 +97,7 @@ _lsp_query_blob() {
 }
 
 _lsp_write_blob() {
-    _lsp_check_schema || return 1
+    _lsp_check_schema || exit 1
     _lsp_query \
       "INSERT OR REPLACE INTO module_configs \
          (module_pkg_name, user_id, \"group_name\", key_name, data) \
@@ -105,7 +105,7 @@ _lsp_write_blob() {
 }
 
 _lsp_delete_row() {
-    _lsp_check_schema || return 1
+    _lsp_check_schema || exit 1
     _lsp_query \
       "DELETE FROM module_configs \
          WHERE module_pkg_name='$1' \
@@ -116,7 +116,7 @@ _lsp_delete_row() {
 
 _lsp_detect_type() {
     _hex=$1
-    [ -z "$_hex" ] && return 1
+    [ -z "$_hex" ] && exit 1
     _tok=${_hex:8:2}
     case "$_tok" in
         74) echo string ;;
@@ -125,16 +125,16 @@ _lsp_detect_type() {
                 *6A6176612E6C616E672E496E7465676572*) echo int ;;
                 *6A6176612E6C616E672E4C6F6E67*)       echo long ;;
                 *6A6176612E6C616E672E426F6F6C65616E*) echo bool ;;
-                *) return 1 ;;
+                *) exit 1 ;;
             esac
             ;;
-        *) return 1 ;;
+        *) exit 1 ;;
     esac
 }
 
 _lsp_extract_value() {
     _hex=$1
-    [ -z "$_hex" ] && return 1
+    [ -z "$_hex" ] && exit 1
     _tok=${_hex:8:2}
     case "$_tok" in
         74)
@@ -152,10 +152,10 @@ _lsp_extract_value() {
                         01) printf 'true' ;;
                         00) printf 'false' ;;
                     esac ;;
-                *) return 1 ;;
+                *) exit 1 ;;
             esac
             ;;
-        *) return 1 ;;
+        *) exit 1 ;;
     esac
 }
 
@@ -193,17 +193,17 @@ _lsp_build_blob() {
             case "$_val" in
                 true|1)  _vx="01" ;;
                 false|0) _vx="00" ;;
-                *) return 1 ;;
+                *) exit 1 ;;
             esac
             printf '%s' "${_hdr}7372${_cl}${_ch}CD207280D59CFAEE0200015A${_fl}${_fh}7870${_vx}"
             ;;
-        *) return 1 ;;
+        *) exit 1 ;;
     esac
 }
 
 lsp_get() {
     _hex=$(_lsp_query_blob "$1" "$2" "$3")
-    [ -z "$_hex" ] && return 1
+    [ -z "$_hex" ] && exit 1
     _lsp_extract_value "$_hex"
     echo
 }
@@ -215,7 +215,7 @@ lsp_type() {
 
 lsp_set() {
     _type=${5:-string}
-    _blob=$(_lsp_build_blob "$_type" "$4") || return 1
+    _blob=$(_lsp_build_blob "$_type" "$4") || exit 1
     _blob=$(printf '%s' "$_blob" | tr 'a-f' 'A-F')
     _lsp_write_blob "$1" "$2" "$3" "$_blob"
 }
@@ -228,7 +228,7 @@ lsp_has() {
 }
 
 lsp_keys() {
-    _lsp_check_schema || return 1
+    _lsp_check_schema || exit 1
     _lsp_query \
       "SELECT key_name FROM module_configs \
          WHERE module_pkg_name='$1' \
@@ -238,7 +238,7 @@ lsp_keys() {
 }
 
 lsp_groups() {
-    _lsp_check_schema || return 1
+    _lsp_check_schema || exit 1
     _lsp_query \
       "SELECT DISTINCT \"group_name\" FROM module_configs \
          WHERE module_pkg_name='$1' \
@@ -260,7 +260,7 @@ lsp_dump() {
 lsp_raw() { _lsp_query_blob "$1" "$2" "$3"; }
 
 lsp_count() {
-    _lsp_check_schema || return 1
+    _lsp_check_schema || exit 1
     _lsp_query \
       "SELECT count(*) FROM module_configs \
          WHERE module_pkg_name='$1' \

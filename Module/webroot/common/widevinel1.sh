@@ -1,6 +1,7 @@
 #!/system/bin/sh
 # Copy FixWidevineL1/* directory to /data/local/tmp
-cp -r ./FixWidevineL1/* /data/local/tmp/
+SCRDIR=$(cd "$(dirname "$0")" && pwd)
+cp -r "$SCRDIR/FixWidevineL1/"* /data/local/tmp/
 
 # Set correct permissions
 chmod 777 /data/local/tmp/FixWidevineL1.sh

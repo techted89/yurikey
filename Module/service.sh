@@ -77,3 +77,21 @@ check_reset_prop "ro.boot.flash.locked" "1"
 check_reset_prop "ro.boot.avb_version" "1.3"
 check_reset_prop "ro.boot.vbmeta.device_state" "locked"
 check_reset_prop "ro.crypto.state" "encrypted"
+# Additional security property bypasses
+check_reset_prop "ro.boot.dynamic_partitions" "true"
+check_reset_prop "ro.boot.dynamic_partitions_retrofit" "false"
+check_reset_prop "ro.boot.verifiedbootstate" "green"
+check_reset_prop "ro.boot.vbmeta.device_state" "locked"
+check_reset_prop "ro.boot.flash.locked" "1"
+check_reset_prop "ro.boot.veritymode" "enforcing"
+check_reset_prop "ro.build.selinux" "1"
+check_reset_prop "ro.boot.selinux" "enforcing"
+
+# Samsung Knox / TEE flags
+check_reset_prop "ro.boot.knox" "0"
+check_reset_prop "ro.boot.warranty_bit" "0"
+check_reset_prop "ro.warranty_bit" "0"
+
+# Hiding root traces in logs
+resetprop -n log.tag.Magisk "DEBUG"
+resetprop -n log.tag.Zygisk "DEBUG"
