@@ -133,7 +133,10 @@ function runScript(scriptName, basePath, button, callback) {
     const normalized = (typeof b === "undefined" && typeof c === "undefined")
       ? { code: 0, out: a, err: "" }
       : { code: a, out: b, err: c };
-    handleScriptResult(normalized, scriptName);
+    const output = normalized.code !== 0
+      ? normalized.err
+      : (normalized.out + (normalized.err ? "\n" + normalized.err : ""));
+    handleScriptResult(output, scriptName);
     if (typeof callback === "function") callback(normalized);
   };
 
