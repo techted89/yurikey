@@ -33,7 +33,11 @@ if pm list packages org.frknkrc44.hma_oss | grep -q org.frknkrc44.hma_oss; then
     rm -f "$TMP_HMA_FILE"
     exit 1
   fi
-  mv -f "$TMP_HMA_FILE" "$HMA_FILE"
+  if ! mv -f "$TMP_HMA_FILE" "$HMA_FILE"; then
+    log_message "Error: Failed to install config file"
+    rm -f "$TMP_HMA_FILE"
+    exit 1
+  fi
 elif pm list packages com.tsng.hidemyapplist | grep -q com.tsng.hidemyapplist; then
   log_message "HMA is deprecated and not supported, please use latest HMA-oss to get latest configs"
   exit 1
