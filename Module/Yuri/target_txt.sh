@@ -64,7 +64,7 @@ add_packages() {
         exit 1
     fi
 
-    echo "$pkgs" | cut -d ":" -f 2 | while read -r pkg; do
+    for pkg in $(echo "$pkgs" | cut -d ":" -f 2); do
         if [ -n "$pkg" ] && ! grep -q "^$pkg" "$t"; then
             if [ "$teeBroken" = "true" ]; then
                 if ! echo "$pkg?" >> "$t"; then

@@ -21,7 +21,7 @@
   "advance_menu_title": "Розширене Меню",
   "advance_clear_all_detection_traces": "Очистити всі сліди виявлення",
   "advance_set_hma-oss_configs": "Встановити конфігурацію HMA-oss",
-  "advance_fix_detect_vector": "Виправити виявлення Isposed (2)",
+  "advance_fix_detect_vector": "Виправити виявлення Vector (2)",
   "advance_fix_detect_pif": "Виправити виявлення PIF (1)",
   "advance_fix_detect_recovery_file": "Виправити виявлення файлу відновлення",
   "advance_kill_all": "Завершити всі процеси",

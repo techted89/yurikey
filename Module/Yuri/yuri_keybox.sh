@@ -36,7 +36,9 @@ download() {
     else
         busybox wget -T 10 --no-check-certificate -qO- "$1"
     fi
+    _rc=$?
     PATH="$ORG_PATH"
+    return $_rc
 }
 
 # Function to download the remote keybox
@@ -52,14 +54,14 @@ get_keybox() {
 
     rm -f "$REMOTE_FILE"
     mv "$DECODE_FILE" "$TARGET_FILE"
-    exit 0
+    return 0
 }
 
 # Function to update the keybox file
 update_keybox() {
   if ! get_keybox; then
     log_message "Failed to fetch keybox!"
-    exit
+    exit 1
   fi
 }
 

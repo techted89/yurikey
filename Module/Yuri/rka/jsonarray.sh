@@ -4,7 +4,7 @@
 #
 #   ja_count    <file>                          -> integer
 #   ja_get      <file> <id|idx> <field>         -> raw value
-#   ja_has      <file> <id|idx>                 -> exit 0/1
+#   ja_has      <file> <id|idx>                 -> return 0/1
 #   ja_index    <file> <id>                     -> 1-based index
 #   ja_id       <file> <idx>                    -> id string
 #   ja_ids      <file>                          -> one id per line
@@ -12,9 +12,9 @@
 #   ja_dump     <file> <id|idx>                 -> key\tvalue per line
 #   ja_search   <file> <field> <value>          -> matching indices per line
 #   ja_add      <file> <k=v> [k=v ...]          -> prints assigned id
-#   ja_set      <file> <id|idx> <field> <v> [t] -> exit 0/1 (t: s/n/b)
-#   ja_del      <file> <id|idx>                 -> exit 0/1
-#   ja_delfield <file> <id|idx> <field>         -> exit 0/1
+#   ja_set      <file> <id|idx> <field> <v> [t] -> return 0/1 (t: s/n/b)
+#   ja_del      <file> <id|idx>                 -> return 0/1
+#   ja_delfield <file> <id|idx> <field>         -> return 0/1
 #   ja_raw      <file>                          -> full JSON
 
 _JA_AWK='

@@ -64,7 +64,9 @@ function setupRefreshButton() {
     }
 
     if (typeof window.runScript === "function") {
-      window.runScript(scriptName, BASE_SCRIPT, refreshBtn, async () => {
+      window.runScript(scriptName, BASE_SCRIPT, refreshBtn, async (result) => {
+        if (result === null) return;
+
         try {
           const data = await waitForValidDeviceInfo();
           document.getElementById("android-version").innerText = data.android || "-";
@@ -77,9 +79,6 @@ function setupRefreshButton() {
         if (typeof window.updateNetworkStatus === "function") {
           window.updateNetworkStatus();
         }
-
-        refreshBtn.classList.remove("rotating");
-        refreshBtn.disabled = false;
       });
     } else {
        console.error("runScript not found");
