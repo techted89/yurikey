@@ -21,7 +21,7 @@
   "advance_menu_title": "Menu nâng cao",
   "advance_clear_all_detection_traces": "Xóa tất cả các dấu vết",
   "advance_set_hma-oss_configs": "Cài đặt",
-  "advance_fix_detect_lsposed": "Sửa lỗi phát hiện lsposed (2)",
+  "advance_fix_detect_vector": "Sửa lỗi phát hiện Vector (2)",
   "advance_fix_detect_pif": "Sửa lỗi phát hiện PIF (1)",
   "advance_fix_detect_recovery_file": "Sửa lỗi phát hiện File Recovery",
   "advance_kill_all": "Xóa tất cả các tiến trình",

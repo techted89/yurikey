@@ -21,7 +21,7 @@
   "advance_menu_title": "Μενού για προχωρημένους",
   "advance_clear_all_detection_traces": "Διαγραφή όλων των ιχνών ανίχνευσης",
   "advance_set_hma-oss_configs": "Ορισμός ρυθμίσεων HMA-oss",
-  "advance_fix_detect_lsposed": "Διόρθωση Εντοπισμός lsposed (2)",
+  "advance_fix_detect_vector": "Διόρθωση Εντοπισμός Vector (2)",
   "advance_fix_detect_pif": "Διόρθωση Εντοπισμός PIF (1)",
   "advance_fix_detect_recovery_file": "Διόρθωση Εντοπισμός αρχείου ανάκτησης",
   "advance_kill_all": "Τερματισμός Όλων Των Διεργασιών",

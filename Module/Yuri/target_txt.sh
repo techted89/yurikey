@@ -15,7 +15,7 @@ if [ -f "$tees" ]; then
     teeBroken=$(grep -E '^teeBroken=' "$tees" | cut -d '=' -f2 2>/dev/null || echo "false")
     if [ -z "$teeBroken" ]; then
         log_message "Error: Failed to parse teeBroken status"
-        return 1
+        exit 1
     fi
 fi
 
@@ -50,7 +50,7 @@ com.chunqiunativecheck?"
 for entry in $fixed_targets; do
     if ! echo "$entry" >> "$t"; then
         log_message "Error: Failed to write $entry to $t"
-        return 1
+        exit 1
     fi
 done
 
@@ -61,20 +61,20 @@ add_packages() {
     pkgs=$(pm list packages "$1" 2>/dev/null)
     if [ $? -ne 0 ] || [ -z "$pkgs" ]; then
         log_message "Error: Failed to list packages with flag $1"
-        return 1
+        exit 1
     fi
 
-    echo "$pkgs" | cut -d ":" -f 2 | while read -r pkg; do
+    for pkg in $(echo "$pkgs" | cut -d ":" -f 2); do
         if [ -n "$pkg" ] && ! grep -q "^$pkg" "$t"; then
             if [ "$teeBroken" = "true" ]; then
                 if ! echo "$pkg?" >> "$t"; then
                     log_message "Error: Failed to write $pkg? to $t"
-                    return 1
+                    exit 1
                 fi
             else
                 if ! echo "$pkg" >> "$t"; then
                     log_message "Error: Failed to write $pkg to $t"
-                    return 1
+                    exit 1
                 fi
             fi
         fi

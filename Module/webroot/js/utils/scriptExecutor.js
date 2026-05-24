@@ -5,16 +5,16 @@ function getScriptExecutor() {
   if (typeof window.YuriKeyHost?.execScript === "function") {
     return (scriptPath, scriptName, cb) => {
       Promise.resolve(window.YuriKeyHost.execScript(scriptPath, scriptName))
-        .then(result => cb(typeof result === "string" ? result : JSON.stringify(result)))
-        .catch(() => cb(""));
+        .then(result => cb(0, typeof result === "string" ? result : JSON.stringify(result), ""))
+        .catch(() => cb(1, "", "Execution failed"));
     };
   }
 
   if (typeof window.execYurikeyScript === "function") {
     return (scriptPath, scriptName, cb) => {
       Promise.resolve(window.execYurikeyScript(scriptPath, scriptName))
-        .then(result => cb(typeof result === "string" ? result : JSON.stringify(result)))
-        .catch(() => cb(""));
+        .then(result => cb(0, typeof result === "string" ? result : JSON.stringify(result), ""))
+        .catch(() => cb(1, "", "Execution failed"));
     };
   }
 
@@ -92,10 +92,16 @@ function closeHistoryDialog() {
   overlay.classList.remove("active");
 }
 
-function handleScriptResult(rawOutput, scriptName) {
+function handleScriptResult(rawOutput, scriptName, options = {}) {
   const raw = typeof rawOutput === "string" ? rawOutput.trim() : "";
+  const exitCode = options.exitCode ?? options.code;
 
   if (!raw) {
+    if (exitCode !== undefined && exitCode !== 0) {
+      addScriptHistory(scriptName, \`Exit Code: \${exitCode}\`);
+      showToast(tFormat("script_execution_failed_generic"), "error", 4000);
+      return;
+    }
     showToast(tFormat("success", { script: scriptName }), "success", 3000);
     return;
   }
@@ -112,25 +118,58 @@ function handleScriptResult(rawOutput, scriptName) {
     }
   } catch {
     addScriptHistory(scriptName, raw);
-    showToast(tFormat("success", { script: scriptName }), "success", 3500);
+    if (exitCode !== undefined && exitCode !== 0) {
+        showToast(t("script_execution_failed_generic"), "error", 4000);
+    } else {
+        showToast(tFormat("success", { script: scriptName }), "success", 3500);
+    }
   }
 }
 
-function runScript(scriptName, basePath, button) {
-  const scriptPath = `${basePath}${scriptName}`;
+function runScript(scriptName, basePath, button, callback) {
+  const scriptPath = \`\${basePath}\${scriptName}\`;
   const executeScript = getScriptExecutor();
 
-  const originalClass = button.className;
-  button.classList.add("executing");
+  if (button) {
+    button.classList.add("executing");
+    button.disabled = true;
+  }
 
-  const cb = `cb_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+  const cb = \`cb_\${Date.now()}_\${Math.floor(Math.random() * 1000)}\`;
   let timeoutId;
 
-  window[cb] = (output) => {
+  window[cb] = async (arg1, arg2, arg3) => {
     clearTimeout(timeoutId);
     delete window[cb];
-    button.className = originalClass;
-    handleScriptResult(output, scriptName);
+
+    let code, out, err;
+    if (typeof arg1 === "number") {
+        // KernelSU signature: (code, out, err)
+        code = arg1;
+        out = arg2;
+        err = arg3;
+    } else {
+        // Fallback signature: (output)
+        code = 0;
+        out = arg1;
+        err = "";
+    }
+
+    const combinedOutput = code === 0 ? (out || "") : (err || out || "Execution failed");
+
+    try {
+        handleScriptResult(combinedOutput, scriptName, { exitCode: code });
+        if (typeof callback === "function") {
+            await callback(code === 0 ? combinedOutput : null);
+        }
+    } catch (e) {
+        console.error("Callback error:", e);
+    } finally {
+        if (button) {
+            button.classList.remove("executing");
+            button.disabled = false;
+        }
+    }
   };
 
   try {
@@ -143,18 +182,22 @@ function runScript(scriptName, basePath, button) {
   } catch (_e) {
     clearTimeout(timeoutId);
     delete window[cb];
-    button.className = originalClass;
+    if (button) {
+      button.classList.remove("executing");
+      button.disabled = false;
+    }
     addScriptHistory(scriptName, t("script_execution_failed_generic"));
     showToast(t("script_execution_failed_generic"), "error", 4500);
+    if (typeof callback === "function") callback(null);
     return;
   }
 
   timeoutId = setTimeout(() => {
-    delete window[cb];
-    button.className = originalClass;
-    addScriptHistory(scriptName, tFormat("timeout", { script: scriptName }));
-    showToast(t("script_execution_failed_generic"), "error", 4500);
-  }, 7000);
+    const handler = window[cb];
+    if (handler) {
+        handler(1, "", tFormat("timeout", { script: scriptName }));
+    }
+  }, 30000);
 }
 
 // Export functions to window object

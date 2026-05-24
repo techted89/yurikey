@@ -21,7 +21,7 @@
   "advance_menu_title": "Erweitertes Menü",
   "advance_clear_all_detection_traces": "Lösche alle Erkennungspfade",
   "advance_set_hma-oss_configs": "Setzte HMA-oss Konfiguration",
-  "advance_fix_detect_lsposed": "Repariere auffinden von lsposed (2)",
+  "advance_fix_detect_vector": "Repariere auffinden von Vector (2)",
   "advance_fix_detect_pif": "Repariere PIF Erkennung (1)",
   "advance_fix_detect_recovery_file": "Repariere auffinden von Recovery Datei",
   "advance_kill_all": "Stoppe alle Prozesse",

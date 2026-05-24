@@ -23,9 +23,9 @@
 #
 #   lsp_get     <mod> <group> <key>              -> raw value
 #   lsp_type    <mod> <group> <key>              -> string|int|long|bool
-#   lsp_set     <mod> <group> <key> <val> [type] -> exit 0/1
-#   lsp_del     <mod> <group> <key>              -> exit 0/1
-#   lsp_has     <mod> <group> <key>              -> exit 0/1
+#   lsp_set     <mod> <group> <key> <val> [type] -> return 0/1
+#   lsp_del     <mod> <group> <key>              -> return 0/1
+#   lsp_has     <mod> <group> <key>              -> return 0/1
 #   lsp_keys    <mod> <group>                    -> one key per line
 #   lsp_groups  <mod>                            -> one group per line
 #   lsp_dump    <mod> <group>                    -> key\ttype\tvalue per line

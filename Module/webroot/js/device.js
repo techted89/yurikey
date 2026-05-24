@@ -1,5 +1,4 @@
 // Device Information Component
-const BASE_SCRIPT = "/data/adb/modules/Yurikey/webroot/common/";
 
 // Wait until translation data is loaded
 async function waitForTranslations(timeout = 3000) {
@@ -47,47 +46,45 @@ async function loadDeviceInfo() {
   }
 }
 
-// Execute a shell script with KernelSU
-function runScript(scriptName, callback) {
-  const fullPath = `${BASE_SCRIPT}${scriptName}`;
-  if (typeof ksu === "object" && typeof ksu.exec === "function") {
-    const cbId = `cb_${Date.now()}`;
-    window[cbId] = () => {
-      delete window[cbId];
-      if (typeof callback === "function") callback();
-    };
-    ksu.exec(`sh '${fullPath}'`, "{}", cbId);
-  } else {
-    console.warn("ksu.exec not available.");
-    if (typeof callback === "function") callback();
-  }
-}
-
 // Setup refresh button behavior with translation and animation
 function setupRefreshButton() {
   const refreshBtn = document.getElementById("refresh-info-btn");
   if (!refreshBtn) return;
 
   const scriptName = refreshBtn.dataset.script;
+  const BASE_SCRIPT = "/data/adb/modules/Yurikey/";
 
   refreshBtn.addEventListener("click", () => {
     if (refreshBtn.disabled) return;
     refreshBtn.disabled = true;
     refreshBtn.classList.add("rotating");
 
-    runScript(scriptName, async () => {
-      try {
-        const data = await waitForValidDeviceInfo();
-        document.getElementById("android-version").innerText = data.android || "-";
-        document.getElementById("kernel-version").innerText = data.kernel || "-";
-        document.getElementById("root-type").innerText = data.root || "-";
-      } catch (err) {
-        console.warn("Could not update device info:", err);
-      }
+    if (typeof showToast === "function" && typeof t === "function") {
+      showToast(t("home_refreshing"), "info");
+    }
 
-      refreshBtn.classList.remove("rotating");
-      refreshBtn.disabled = false;
-    });
+    if (typeof window.runScript === "function") {
+      window.runScript(scriptName, BASE_SCRIPT, refreshBtn, async (result) => {
+        if (result === null) return;
+
+        try {
+          const data = await waitForValidDeviceInfo();
+          document.getElementById("android-version").innerText = data.android || "-";
+          document.getElementById("kernel-version").innerText = data.kernel || "-";
+          document.getElementById("root-type").innerText = data.root || "-";
+        } catch (err) {
+          console.warn("Could not update device info:", err);
+        }
+
+        if (typeof window.updateNetworkStatus === "function") {
+          window.updateNetworkStatus();
+        }
+      });
+    } else {
+       console.error("runScript not found");
+       refreshBtn.classList.remove("rotating");
+       refreshBtn.disabled = false;
+    }
   });
 }
 
@@ -96,14 +93,6 @@ window.addEventListener("DOMContentLoaded", async () => {
   await waitForTranslations();     // Make sure translations are loaded
   loadDeviceInfo();                // Load initial device info
   setupRefreshButton();           // Setup refresh button
-
-  // Bind all action buttons to their scripts
-  document.querySelectorAll(".action-buttons .menu-btn").forEach(button => {
-    const scriptName = button.dataset.script;
-    if (scriptName) {
-      button.addEventListener("click", () => runScript(scriptName));
-    }
-  });
 });
 
 window.loadDeviceInfo = loadDeviceInfo;

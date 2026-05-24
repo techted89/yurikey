@@ -21,7 +21,7 @@
   "advance_menu_title": "高级菜单",
   "advance_clear_all_detection_traces": "清除所有检测痕迹",
   "advance_set_hma-oss_configs": "更新 HMA-oss 配置",
-  "advance_fix_detect_lsposed": "修复 Detect lsposed (2)",
+  "advance_fix_detect_vector": "修复 Detect Vector (2)",
   "advance_fix_detect_pif": "修复 Detect PIF (1)",
   "advance_fix_detect_recovery_file": "修复检测到恢复文件",
   "advance_kill_all": "终止全部进程",

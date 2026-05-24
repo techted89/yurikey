@@ -2,7 +2,7 @@
 
 # Define important paths and file names
 HMA_DIR="/data/user/0/org.frknkrc44.hma_oss/files"
-HMA_FILE="/data/user/0/org.frknkrc44.hma_oss/files/config.json"
+HMA_FILE="$HMA_DIR/config.json"
 REMOTE_URL="https://raw.githubusercontent.com/YurikeyDev/yurikey/refs/heads/main/config.json"
 ORG_PATH="$PATH"
 
@@ -17,17 +17,20 @@ download() {
     else
         busybox wget -T 10 --no-check-certificate -qO- "$1"
     fi
+    _rc=$?
     PATH="$ORG_PATH"
+    return $_rc
 }
 
-if pm list packages | grep -q org.frknkrc44.hma_oss; then
+if pm list packages org.frknkrc44.hma_oss | grep -q org.frknkrc44.hma_oss; then
   mkdir -p "$HMA_DIR"
-  download "$REMOTE_URL" > "$HMA_FILE" || log_message "Error: HMA-oss configs download failed, please download and add it manually!"
-elif pm list packages | grep -q com.tsng.hidemyapplist; then
+  if ! download "$REMOTE_URL" > "$HMA_FILE"; then log_message "Error: HMA-oss configs download failed, please download and add it manually!"; exit 1; fi
+elif pm list packages com.tsng.hidemyapplist | grep -q com.tsng.hidemyapplist; then
   log_message "HMA is deprecated and not supported, please use latest HMA-oss to get latest configs"
+  exit 1
 else
   log_message "Error: HMA-oss not found, please install latest HMA-oss"
-  return 1
+  exit 1
 fi
 
 chmod 777 "$HMA_FILE"
